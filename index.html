@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta   http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script src="https://cdn.usebootstrap.com/bootstrap/latest/js/bootstrap.min.js"></script> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> 
+    <link rel="stylesheet" type="css" href="sign.css" />
+    <script src="sign.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.usebootstrap.com/bootstrap/latest/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+  <style>
+
+#dropsign {
+  border: 1px dashed #c97d19; 
+  padding : 10px ; 
+  width: 400px;
+} 
+.case {
+  width: 1200px;
+  overflow-wrap: break-word;
+  display: flex;
+  flex-direction: column;
+  font-size: 20px;
+}
+
+
+  </style>
+  </head>
+
+
+  <body>
+   <div>
+
+
+                <div class="page-header">
+                  <h1 > Signature </h1>     
+                </div>
+                <p> <strong>Glisser et déposer votre ficher à signer</strong>  </p>
+                <input id="dropsign" type= 'file' accept='*' onchange='openFile(event)' value="HERE"><br>
+
+
+                   <input class="btn btn-warning" id="case"  name="generate"   type="button" value="Générer signature :" />
+                  <div  name="generate_signature"></div>
+  
+                  <h1> Verification d'une signature </h1>
+                  <p>Glisser et déposer clé de vérification</p>
+  
+                    <!--  deposer  signature -->
+                    <input id="dropsign" type= 'file' accept='*' onchange='openFile1(event)'><br>
+                    <!--  deposer  pdf-->
+
+
+                        <p>Glisser et déposer votre fichier</p>
+
+                    <input id="dropsign" type= 'file' accept='*' onchange='openFile2(event)'><br>
+ 
+                      <input class="btn btn-danger" name="verify"  type="button" value="vérifier signature:"   />
+                      <label  name ="verify_label" for="verify_label" ></label>
+
+   </div>
+    
+            
+           
+
+ 
+       
+
+  </body>
+  <script>
+    function convertArrayBufferToHexa(buffer)
+  {
+      let i, len, hex = '', c;
+
+
+      let data_view = new DataView(buffer);
+      len = data_view.byteLength;
+      for(i = 0; i < len; i++)
+      {
+          c = data_view.getUint8(i).toString(16);
+          if(c.length < 2)
+          {
+              c = '0' + c;
+          }
+
+          hex += c;
+      }
+
+      return hex;
+  }
+//  fonction sign
+    
+    var openFile = function(event) {
+      var input = event.target;
+      var reader = new FileReader();
+      reader.onload = function(){
+        var buffer = reader.result;
+        var array = new Uint8Array(buffer) ; 
+        let hachage = crypto.subtle.digest({name: "SHA-256"},array);
+        hachage.then(function(yessa){
+          window['message_hash']=BigInt("0x"+convertArrayBufferToHexa(yessa));
+          console.log( window['message_hash'] , "window['message_hash']") ; 
+        
+        });
+      };
+      reader.readAsArrayBuffer(input.files[0]);
+    };
+
+    //   fonction pour la drop de verif
+
+    var openFile1 = function(event) {
+      var input = event.target;
+      var reader = new FileReader();
+      reader.onload = function(){
+        var buffer = reader.result;
+
+        var lines = buffer.split('\n');    // lines is an array of strings
+        array = [] ; 
+        for (var j = 0; j < lines.length; j++) {
+             array[j]=  BigInt(lines[j]) ; 
+             console.log('Line ' + j + ' is ' + BigInt(lines[j]).toString(16)) ;
+             console.log(array[j] , 'array') ; 
+             
+        }
+        window['p1'] = array [0]  ; 
+        window['q1'] = array [1]  ; 
+        window['alpha1'] = array [2]  ; 
+        window['beta1'] = array [3]  ; 
+        window['gamma1'] = array [4]  ; 
+        window['delta1'] = array [5]  ;
+        //window['hash1'] =BigInt('2337434210042974538707009456476465850729252227732486499284030197153425783457') ; 
+        console.log( window['delta1'] , "verificatjhdo de delta reception"); 
+
+
+      };
+      reader.readAsText(input.files[0]);
+      
+    };
+
+    
+    //   fonction pour la drop de verif pdf   
+    var openFile2 = function(event) {
+      var input = event.target;
+      var reader = new FileReader();
+      reader.onload = function(){
+        console.log(reader.result , 'reader') ; 
+        var buffer = reader.result;
+        var array = new Uint8Array(buffer) ; 
+        let hachage = crypto.subtle.digest({name: "SHA-256"},array);
+        hachage.then(function(yessa){
+          window['hash1']=BigInt("0x"+convertArrayBufferToHexa(yessa));
+          console.log(window['hash1'] , 'ok') ; 
+       
+        });
+      };
+      reader.readAsArrayBuffer(input.files[0]);
+    };
+
+  </script>
+</html>

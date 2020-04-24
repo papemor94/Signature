@@ -1,0 +1,7 @@
+/************  Le style de notre application  **************/
+
+div {
+    word-wrap:break-word;
+    overflow-wrap: break-word;
+    width: 100%;
+  }
